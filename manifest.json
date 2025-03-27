@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "流日生年四化",
+  "version": "1.0",
+  "description": "紫微斗数流日生年四化查询工具",
+  "icons": {
+    "16": "lr.png",
+    "48": "lr.png",
+    "128": "lr.png"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "lr.png",
+      "48": "lr.png",
+      "128": "lr.png"
+    }
+  },
+  "permissions": []
+} 

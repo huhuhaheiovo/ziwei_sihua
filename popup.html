@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>流日生年四化</title>
+    <style>
+        /* 基础样式 */
+        body {
+            background-color: #a8b0a8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            overflow: hidden;
+            background-image: var(--pattern-dots-lg);
+        }
+
+        /* 卡片容器 */
+        .meeting-card {
+            background-color: #e9eeea;
+            padding: 1.25rem;
+            width: 100%;
+            max-width: 350px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            background-image: var(--pattern-grid-sm);
+        }
+
+        /* 标题和日期选择器 */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+        }
+
+        .title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            line-height: 1.2;
+        }
+
+        /* 日期选择器 */
+        .date-selector {
+            background-color: #e9eeea;
+            border-radius: 9999px;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            border: 1px solid #d0d0ce;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            transition: background-color 0.2s ease;
+            position: relative;
+        }
+
+        .date-selector:hover {
+            background-color: #dededd;
+        }
+
+        .date-selector span {
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-right: 0.5rem;
+        }
+
+        /* 通话信息 */
+        .calls-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .calls-info span {
+            margin-left: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        /* 四化星样式 */
+        .sihua-item {
+            display: inline-block;
+            margin-right: 0.5rem;
+        }
+
+        .sihua-item:last-child {
+            margin-right: 0;
+        }
+
+        .sihua-lu {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .sihua-quan {
+            color: #2ecc71;
+            font-weight: bold;
+        }
+
+        .sihua-ke {
+            color: #3498db;
+            font-weight: bold;
+        }
+
+        .sihua-ji {
+            color: #9b59b6;
+            font-weight: bold;
+        }
+
+        /* 日期导航和指示器 */
+        .date-nav-and-indicators {
+            position: relative;
+            touch-action: pan-y;
+            user-select: none;
+            overflow: hidden;
+        }
+
+        .date-nav-container, .month-selector {
+            transition: transform 0.3s ease;
+        }
+
+        /* 隐藏圆点按钮 */
+        .date-nav-arrow {
+            display: none;
+        }
+
+        /* 滑动时的动画效果 */
+        .sliding {
+            transition: transform 0.1s linear;
+        }
+
+        /* 日期导航容器 */
+        .date-nav-container {
+            background-color: white;
+            border-radius: 16px;
+            padding: 12px 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        /* 日期项 */
+        .day-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            width: calc(100% / 7);
+        }
+
+        .day-number,
+        .day-name {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 36px;
+            background-color: transparent;
+            transition: background-color 0.2s ease;
+        }
+
+        .day-number {
+            font-size: 1.1rem;
+            font-weight: 600;
+            height: 26px;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            padding-top: 4px;
+        }
+
+        .day-name {
+            font-size: 0.65rem;
+            height: 18px;
+            color: #666;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+        }
+
+        /* 悬停和选中状态 */
+        .day-item:hover .day-number,
+        .day-item:hover .day-name {
+            background-color: #f8f8f8;
+        }
+
+        .day-active .day-number,
+        .day-active .day-name {
+            background-color: #f0ff7a;
+        }
+
+        /* 指示器容器 */
+        .indicator-container {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            position: relative;
+            padding: 0 28px;
+            box-sizing: border-box;
+        }
+
+        /* 指示器点 */
+        .indicator-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #d0d0ce;
+            position: relative;
+            z-index: 2;
+        }
+
+        .indicator-active {
+            background-color: #000;
+        }
+
+        /* 虚线连接 */
+        .indicator-line {
+            position: absolute;
+            top: 50%;
+            left: 32px;
+            right: 32px;
+            height: 1px;
+            border-top: 1.5px dashed #d0d0ce;
+            z-index: 1;
+        }
+
+        /* 月份选择器样式 */
+        .month-selector {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .month-option {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 6px 8px;
+            margin: 4px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #333;
+            width: calc(25% - 16px);
+            box-sizing: border-box;
+        }
+
+        .month-option:hover {
+            background-color: #f8f8f8;
+        }
+
+        .month-option.active {
+            background-color: #f0ff7a;
+            font-weight: bold;
+        }
+
+        /* 月份视图状态下不显示指示器 */
+        .date-nav-and-indicators.month-view .indicator-container {
+            display: none;
+        }
+
+        /* 页面容器 */
+        .page-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            max-width: 380px;
+            border: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page-container">
+        <div class="meeting-card">
+            <!-- 标题和日期选择器 -->
+            <div class="header">
+                <div class="title">流日生年四化</div>
+                <div class="date-selector" id="month-selector">
+                    <span id="current-month">九月</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd"
+                            d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
+                    </svg>
+                </div>
+            </div>
+
+            <!-- 通话信息 -->
+            <div class="calls-info">
+                <span id="calls-info">流日生年四化</span>
+            </div>
+
+            <div class="date-nav-and-indicators">
+                <!-- 日期导航 -->
+                <div class="date-nav-container" id="days-container">
+                    <!-- 日期项将由JavaScript动态生成 -->
+                </div>
+
+                <!-- 指示器点和虚线 -->
+                <div class="indicator-container" id="indicator-container">
+                    <div class="indicator-line"></div>
+                    <!-- 指示器点将由JavaScript动态生成 -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="iztro.min.js"></script>
+    <script src="popup.js"></script>
+</body>
+
+</html> 
